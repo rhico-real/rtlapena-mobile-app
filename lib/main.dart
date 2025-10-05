@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'constants/app_constants.dart';
-import 'screens/report_form_screen.dart';
+import 'screens/reports_list_screen.dart';
 
 void main() {
   runApp(const RTLapenaApp());
@@ -132,7 +132,7 @@ class _SplashScreenState extends State<SplashScreen>
       Future.delayed(const Duration(seconds: 1), () {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => const ReportFormScreen(),
+            builder: (context) => const ReportsListScreen(),
           ),
         );
       });

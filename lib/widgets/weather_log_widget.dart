@@ -6,11 +6,7 @@ class WeatherLogWidget extends StatefulWidget {
   final List<String> weatherStates;
   final Function(int, String) onWeatherChange;
 
-  const WeatherLogWidget({
-    super.key,
-    required this.weatherStates,
-    required this.onWeatherChange,
-  });
+  const WeatherLogWidget({super.key, required this.weatherStates, required this.onWeatherChange});
 
   @override
   State<WeatherLogWidget> createState() => _WeatherLogWidgetState();
@@ -57,7 +53,7 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
   Widget _buildWeatherSummary() {
     final morningSlots = TimeSlots.morningSlots.length;
     final afternoonSlots = TimeSlots.afternoonSlots.length;
-    
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -74,11 +70,7 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
             value: morningSlots.toString(),
             color: Colors.orange,
           ),
-          Container(
-            width: 1,
-            height: 40,
-            color: AppColors.border,
-          ),
+          Container(width: 1, height: 40, color: AppColors.border),
           _buildSummaryItem(
             icon: Icons.wb_twilight,
             label: 'Afternoon\nTime Slots',
@@ -102,16 +94,11 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
         const SizedBox(height: 4),
         Text(
           value,
-          style: AppTextStyles.heading3.copyWith(
-            color: color,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTextStyles.heading3.copyWith(color: color, fontWeight: FontWeight.bold),
         ),
         Text(
           label,
-          style: AppTextStyles.caption.copyWith(
-            color: AppColors.textSecondary,
-          ),
+          style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
           textAlign: TextAlign.center,
         ),
       ],
@@ -124,10 +111,7 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
       children: [
         Text(
           'Select Time Slot to Set Weather',
-          style: AppTextStyles.body.copyWith(
-            fontWeight: FontWeight.w600,
-            color: AppColors.textSecondary,
-          ),
+          style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600, color: AppColors.textSecondary),
         ),
         const SizedBox(height: 12),
         _buildShiftCards('Morning Shift', TimeSlots.morningSlots),
@@ -139,11 +123,9 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
 
   Widget _buildWeatherStatusCard() {
     // Determine what weather to show: selected slot's weather or default weather
-    final currentWeather = _selectedSlotIndex != null 
-        ? widget.weatherStates[_selectedSlotIndex!]
-        : _defaultWeather;
+    final currentWeather = _selectedSlotIndex != null ? widget.weatherStates[_selectedSlotIndex!] : _defaultWeather;
     final weatherInfo = WeatherConditions.weatherMap[currentWeather]!;
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -154,10 +136,7 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Default Weather for Quick Actions',
-            style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
-          ),
+          Text('Default Weather for Quick Actions', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
           const SizedBox(height: 12),
           GestureDetector(
             onTap: () {
@@ -177,11 +156,7 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
                 color: weatherInfo.color,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
-                  BoxShadow(
-                    color: weatherInfo.color.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
+                  BoxShadow(color: weatherInfo.color.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4)),
                 ],
               ),
               child: Column(
@@ -243,10 +218,7 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
       children: [
         Text(
           shiftName,
-          style: AppTextStyles.caption.copyWith(
-            fontWeight: FontWeight.w600,
-            color: AppColors.textSecondary,
-          ),
+          style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600, color: AppColors.textSecondary),
         ),
         const SizedBox(height: 8),
         Wrap(
@@ -269,7 +241,7 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
                     _activeQuickAction = null; // Deselect "Set Entire Day"
                   }
                 });
-                
+
                 // Directly cycle the weather for this slot
                 _handleWeatherTap(globalIndex);
               },
@@ -278,30 +250,20 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
                 decoration: BoxDecoration(
                   color: weatherInfo.color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: weatherInfo.color,
-                    width: 1,
-                  ),
+                  border: Border.all(color: weatherInfo.color, width: 1),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       slot.label,
-                      style: TextStyle(
-                        fontSize: 9,
-                        color: weatherInfo.color,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: TextStyle(fontSize: 11, color: weatherInfo.color, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(width: 3),
                     Container(
                       width: 4,
                       height: 4,
-                      decoration: BoxDecoration(
-                        color: weatherInfo.color,
-                        shape: BoxShape.circle,
-                      ),
+                      decoration: BoxDecoration(color: weatherInfo.color, shape: BoxShape.circle),
                     ),
                   ],
                 ),
@@ -337,19 +299,13 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
               Expanded(
                 child: Text(
                   slot.label,
-                  style: AppTextStyles.body.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: weatherInfo.color,
-                  ),
+                  style: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold, color: weatherInfo.color),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          Text(
-            'Current Weather Condition',
-            style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
-          ),
+          Text('Current Weather Condition', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
           const SizedBox(height: 12),
           GestureDetector(
             onTap: () {
@@ -363,11 +319,7 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
                 color: weatherInfo.color,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
-                  BoxShadow(
-                    color: weatherInfo.color.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
+                  BoxShadow(color: weatherInfo.color.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4)),
                 ],
               ),
               child: Column(
@@ -386,11 +338,7 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Icon(
-                        Icons.refresh,
-                        color: weatherInfo.textColor,
-                        size: 24,
-                      ),
+                      Icon(Icons.refresh, color: weatherInfo.textColor, size: 24),
                     ],
                   ),
                 ],
@@ -400,10 +348,7 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
           const SizedBox(height: 8),
           Text(
             'Tap the weather card above to cycle through conditions',
-            style: AppTextStyles.caption.copyWith(
-              color: AppColors.textSecondary,
-              fontStyle: FontStyle.italic,
-            ),
+            style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary, fontStyle: FontStyle.italic),
             textAlign: TextAlign.center,
           ),
         ],
@@ -424,50 +369,25 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
         children: [
           Text(
             'Quick Actions',
-            style: AppTextStyles.body.copyWith(
-              fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
-            ),
+            style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 8),
           if (_selectedSlotIndex == null)
             Text(
               'Will set all slots to Fair weather (tap a time slot to use different weather)',
-              style: AppTextStyles.caption.copyWith(
-                color: AppColors.textSecondary,
-                fontStyle: FontStyle.italic,
-              ),
+              style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary, fontStyle: FontStyle.italic),
               textAlign: TextAlign.center,
             ),
           const SizedBox(height: 8),
           Row(
             children: [
-              Expanded(
-                child: _buildQuickActionButton(
-                  'Set All Morning',
-                  'morning',
-                  Icons.wb_sunny,
-                ),
-              ),
+              Expanded(child: _buildQuickActionButton('Set All Morning', 'morning', Icons.wb_sunny)),
               const SizedBox(width: 6),
-              Expanded(
-                child: _buildQuickActionButton(
-                  'Set All Afternoon',
-                  'afternoon',
-                  Icons.wb_twilight,
-                ),
-              ),
+              Expanded(child: _buildQuickActionButton('Set All Afternoon', 'afternoon', Icons.wb_twilight)),
             ],
           ),
           const SizedBox(height: 6),
-          SizedBox(
-            width: double.infinity,
-            child: _buildQuickActionButton(
-              'Set Entire Day',
-              'all_day',
-              Icons.today,
-            ),
-          ),
+          SizedBox(width: double.infinity, child: _buildQuickActionButton('Set Entire Day', 'all_day', Icons.today)),
           const SizedBox(height: 6),
           _buildWeatherButton(),
         ],
@@ -477,7 +397,7 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
 
   Widget _buildWeatherButton() {
     final weatherInfo = WeatherConditions.weatherMap[_defaultWeather]!;
-    
+
     return GestureDetector(
       onTap: () {
         if (_activeQuickAction != null) {
@@ -494,13 +414,7 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
         decoration: BoxDecoration(
           color: weatherInfo.color,
           borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: weatherInfo.color.withOpacity(0.3),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          boxShadow: [BoxShadow(color: weatherInfo.color.withOpacity(0.3), blurRadius: 4, offset: const Offset(0, 2))],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -508,40 +422,28 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
             Flexible(
               child: Text(
                 weatherInfo.name,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: weatherInfo.textColor,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(fontSize: 11, color: weatherInfo.textColor, fontWeight: FontWeight.w600),
               ),
             ),
             const SizedBox(width: 6),
-            Icon(
-              _activeQuickAction != null ? Icons.check : Icons.refresh,
-              color: weatherInfo.textColor,
-              size: 14,
-            ),
+            Icon(_activeQuickAction != null ? Icons.check : Icons.refresh, color: weatherInfo.textColor, size: 14),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildQuickActionButton(
-    String label, 
-    String actionId,
-    IconData icon
-  ) {
+  Widget _buildQuickActionButton(String label, String actionId, IconData icon) {
     final isActive = _activeQuickAction == actionId;
     final shouldGrayOut = _activeQuickAction != null && !isActive;
-    
+
     Color color;
     if (isActive) {
       color = Colors.green; // Active button is green
     } else {
       color = Colors.grey; // All other buttons are gray (default and inactive)
     }
-    
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -560,10 +462,7 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
         decoration: BoxDecoration(
           color: isActive ? color.withOpacity(0.2) : color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: color,
-            width: isActive ? 2 : 1,
-          ),
+          border: Border.all(color: color, width: isActive ? 2 : 1),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -573,11 +472,7 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
             Flexible(
               child: Text(
                 label,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: color,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600),
               ),
             ),
           ],
@@ -589,19 +484,13 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
   Widget _buildWeatherLegend() {
     return Container(
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-      ),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Weather Conditions',
-            style: AppTextStyles.caption.copyWith(
-              fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
-            ),
+            style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 6),
           Wrap(
@@ -622,13 +511,7 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
                     ),
                   ),
                   const SizedBox(width: 3),
-                  Text(
-                    info.name,
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
+                  Text(info.name, style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
                 ],
               );
             }).toList(),
@@ -654,7 +537,7 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
   void _executeQuickAction(String actionId) {
     // Always use default weather since slots aren't selected anymore
     final weatherToApply = _defaultWeather;
-    
+
     switch (actionId) {
       case 'morning':
         for (final slot in TimeSlots.morningSlots) {
@@ -674,7 +557,7 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
         }
         break;
     }
-    
+
     // DO NOT clear active action after execution - keep it active to show other buttons as gray
     // The active state will only be cleared when:
     // 1. User taps the same button again
@@ -694,7 +577,7 @@ class _WeatherLogWidgetState extends State<WeatherLogWidget> {
     final currentIndex = WeatherConditions.allConditions.indexOf(currentCondition);
     final nextIndex = (currentIndex + 1) % WeatherConditions.allConditions.length;
     final nextCondition = WeatherConditions.allConditions[nextIndex];
-    
+
     widget.onWeatherChange(index, nextCondition);
   }
 }

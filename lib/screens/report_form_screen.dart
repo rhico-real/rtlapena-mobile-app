@@ -8,6 +8,7 @@ import '../widgets/weather_log_widget.dart';
 import '../widgets/work_log_widget.dart';
 import '../widgets/issue_photo_widget.dart';
 import 'reports_list_screen.dart';
+import 'pdf_viewer_screen.dart';
 
 class ReportFormScreen extends StatefulWidget {
   final DailyReport? existingReport;
@@ -39,6 +40,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
 
   bool _isLoading = false;
   String? _currentReportId;
+  String? _savedPdfPath; // Track the saved PDF file path
 
   @override
   void initState() {
@@ -100,18 +102,19 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
         ),
         backgroundColor: AppColors.primary,
         elevation: 0,
-        actions: [
-          TextButton.icon(
-            onPressed: () =>
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ReportsListScreen())),
-            icon: const Icon(Icons.folder_open, color: Colors.white, size: 20),
-            label: const Text(
-              'Saved Reports',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14),
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
+        leading: IconButton(
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => const ReportsListScreen()),
+              );
+            }
+          },
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          tooltip: 'Back to Reports',
+        ),
       ),
       body: _isLoading ? const Center(child: CircularProgressIndicator(color: AppColors.primary)) : _buildForm(),
       bottomNavigationBar: _buildBottomActions(),
@@ -140,27 +143,13 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 2))],
       ),
-      child: Column(
-        children: [
-          Text(
-            'R.T. LAPEÑA CONSTRUCTION & SUPPLY, INC.',
-            style: AppTextStyles.heading2.copyWith(color: AppColors.primary, fontSize: 18),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            _currentReportId != null ? 'Edit Daily Report' : 'New Daily Report',
-            style: AppTextStyles.heading1.copyWith(color: AppColors.primary, fontSize: 22),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+      child: Image.asset('assets/images/splash_screen.png', height: 120, fit: BoxFit.contain),
     );
   }
 
@@ -423,45 +412,85 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
         color: Colors.white,
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -2))],
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(
-            child: ElevatedButton(
-              onPressed: _saveReport,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          // First row: Save and Start New
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: _saveReport,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: Text(_currentReportId != null ? 'Update Report' : 'Save Report', style: AppTextStyles.button),
+                ),
               ),
-              child: Text(_currentReportId != null ? 'Update Report' : 'Save Report', style: AppTextStyles.button),
-            ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: _saveAndStartNew,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey[700],
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: Text('Save & Start New', style: AppTextStyles.button, textAlign: TextAlign.center),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: _saveAndStartNew,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey[700],
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          const SizedBox(height: 12),
+          // Second row: PDF actions
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _currentReportId != null ? _generatePdf : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue[600],
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  icon: const Icon(Icons.picture_as_pdf, size: 20),
+                  label: Text('Generate PDF', style: AppTextStyles.button),
+                ),
               ),
-              child: Text('Save & Start New', style: AppTextStyles.button, textAlign: TextAlign.center),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: _currentReportId != null ? _exportToPdf : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red[600],
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _savedPdfPath != null ? _viewPdf : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green[600],
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  icon: const Icon(Icons.visibility, size: 20),
+                  label: Text('View PDF', style: AppTextStyles.button),
+                ),
               ),
-              child: Text('Export PDF', style: AppTextStyles.button),
-            ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _savedPdfPath != null ? _downloadPdf : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red[600],
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  icon: const Icon(Icons.download, size: 20),
+                  label: Text('Download PDF', style: AppTextStyles.button),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -517,9 +546,9 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     }
   }
 
-  Future<void> _exportToPdf() async {
+  Future<void> _generatePdf() async {
     if (_currentReportId == null) {
-      _showErrorMessage('Please save the report before exporting to PDF.');
+      _showErrorMessage('Please save the report before generating PDF.');
       return;
     }
 
@@ -529,7 +558,10 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
 
     try {
       final report = _createReport();
-      await PdfService.generateAndSharePdf(report);
+      final filePath = await PdfService.generateAndSavePdf(report);
+      setState(() {
+        _savedPdfPath = filePath;
+      });
       _showSuccessMessage('PDF generated successfully!');
     } catch (e) {
       _showErrorMessage('Error generating PDF: $e');
@@ -538,6 +570,47 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _downloadPdf() async {
+    if (_savedPdfPath == null) {
+      await _generatePdf();
+      if (_savedPdfPath == null) return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final downloadPath = await PdfService.downloadPdf(_savedPdfPath!);
+      _showSuccessMessage('PDF downloaded to: $downloadPath');
+    } catch (e) {
+      _showErrorMessage('Error downloading PDF: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _viewPdf() {
+    if (_savedPdfPath == null) {
+      _showErrorMessage('Please generate PDF first.');
+      return;
+    }
+
+    final report = _createReport();
+    final reportTitle = 'Report - Block ${report.blockNumber}, Lot ${report.lotNumber}';
+    
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => PdfViewerScreen(
+          filePath: _savedPdfPath!,
+          reportTitle: reportTitle,
+        ),
+      ),
+    );
   }
 
   DailyReport _createReport() {

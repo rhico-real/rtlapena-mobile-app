@@ -43,10 +43,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(
-          'Saved Reports',
-          style: AppTextStyles.heading2.copyWith(color: Colors.white),
-        ),
+        title: Text('Saved Reports', style: AppTextStyles.heading2.copyWith(color: Colors.white)),
         backgroundColor: AppColors.primary,
         elevation: 0,
         actions: [
@@ -56,57 +53,51 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
-          : _buildReportsList(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _createNewReport,
-        backgroundColor: AppColors.primary,
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
+      body: _isLoading ? const Center(child: CircularProgressIndicator(color: AppColors.primary)) : _buildReportsList(),
     );
   }
 
   Widget _buildReportsList() {
-    if (_reports.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.assignment_outlined,
-              size: 64,
-              color: AppColors.textSecondary.withOpacity(0.5),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No reports saved yet',
-              style: AppTextStyles.heading3.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Tap the + button to create your first report',
-              style: AppTextStyles.body.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
     return RefreshIndicator(
       onRefresh: _loadReports,
       color: AppColors.primary,
-      child: ListView.builder(
+      child: ListView(
         padding: const EdgeInsets.all(16),
-        itemCount: _reports.length,
-        itemBuilder: (context, index) {
-          final report = _reports[index];
-          return _buildReportCard(report);
-        },
+        children: [
+          _buildHeader(),
+          const SizedBox(height: 24),
+          if (_reports.isEmpty) _buildEmptyState() else ..._reports.map((report) => _buildReportCard(report)).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 2))],
+      ),
+      child: Image.asset('assets/images/splash_screen.png', height: 120, fit: BoxFit.contain),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.assignment_outlined, size: 64, color: AppColors.textSecondary.withOpacity(0.5)),
+          const SizedBox(height: 16),
+          Text('No reports saved yet', style: AppTextStyles.heading3.copyWith(color: AppColors.textSecondary)),
+          const SizedBox(height: 8),
+          Text(
+            'Tap the + button to create your first report',
+            style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+          ),
+        ],
       ),
     );
   }
@@ -115,9 +106,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: () => _editReport(report),
         borderRadius: BorderRadius.circular(12),
@@ -130,10 +119,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: Text(
-                      'Block ${report.blockNumber}, Lot ${report.lotNumber}',
-                      style: AppTextStyles.heading3,
-                    ),
+                    child: Text('Block ${report.blockNumber}, Lot ${report.lotNumber}', style: AppTextStyles.heading3),
                   ),
                   PopupMenuButton<String>(
                     onSelected: (value) {
@@ -159,48 +145,27 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  Icon(
-                    Icons.calendar_today,
-                    size: 16,
-                    color: AppColors.textSecondary,
-                  ),
+                  Icon(Icons.calendar_today, size: 16, color: AppColors.textSecondary),
                   const SizedBox(width: 4),
-                  Text(
-                    report.reportDate,
-                    style: AppTextStyles.body.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
+                  Text(report.reportDate, style: AppTextStyles.body.copyWith(color: AppColors.textSecondary)),
                   const SizedBox(width: 16),
-                  Icon(
-                    Icons.business,
-                    size: 16,
-                    color: AppColors.textSecondary,
-                  ),
+                  Icon(Icons.business, size: 16, color: AppColors.textSecondary),
                   const SizedBox(width: 4),
                   Text(
                     UnitTypes.unitTypeNames[report.unitType] ?? report.unitType,
-                    style: AppTextStyles.body.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
+                    style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
                   ),
                 ],
               ),
               const SizedBox(height: 8),
               Row(
                 children: [
-                  Icon(
-                    Icons.engineering,
-                    size: 16,
-                    color: AppColors.textSecondary,
-                  ),
+                  Icon(Icons.engineering, size: 16, color: AppColors.textSecondary),
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
                       report.contractorName,
-                      style: AppTextStyles.body.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
+                      style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -209,24 +174,16 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  Icon(
-                    Icons.group,
-                    size: 16,
-                    color: AppColors.textSecondary,
-                  ),
+                  Icon(Icons.group, size: 16, color: AppColors.textSecondary),
                   const SizedBox(width: 4),
                   Text(
                     '${report.personnelCount} personnel',
-                    style: AppTextStyles.body.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
+                    style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
                   ),
                   const Spacer(),
                   Text(
                     'Modified: ${DateFormat('MMM dd, yyyy HH:mm').format(report.timestamp)}',
-                    style: AppTextStyles.caption.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
+                    style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
                   ),
                 ],
               ),
@@ -243,10 +200,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                         ),
                         child: Text(
                           'Issues',
-                          style: AppTextStyles.caption.copyWith(
-                            color: Colors.red,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: AppTextStyles.caption.copyWith(color: Colors.red, fontWeight: FontWeight.w600),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -260,10 +214,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                         ),
                         child: Text(
                           'Safety Notes',
-                          style: AppTextStyles.caption.copyWith(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: AppTextStyles.caption.copyWith(color: Colors.blue, fontWeight: FontWeight.w600),
                         ),
                       ),
                     ],
@@ -278,19 +229,13 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   }
 
   void _createNewReport() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => const ReportFormScreen(),
-      ),
-    );
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const ReportFormScreen()));
   }
 
   void _editReport(DailyReport report) {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => ReportFormScreen(existingReport: report),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).pushReplacement(MaterialPageRoute(builder: (context) => ReportFormScreen(existingReport: report)));
   }
 
   void _confirmDelete(DailyReport report) {
@@ -298,10 +243,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(
-            'Delete Report',
-            style: AppTextStyles.heading3,
-          ),
+          title: Text('Delete Report', style: AppTextStyles.heading3),
           content: Text(
             'Are you sure you want to delete the report for Block ${report.blockNumber}, Lot ${report.lotNumber} dated ${report.reportDate}?',
             style: AppTextStyles.body,
@@ -309,28 +251,17 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                'Cancel',
-                style: AppTextStyles.body.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
+              child: Text('Cancel', style: AppTextStyles.body.copyWith(color: AppColors.textSecondary)),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 _deleteReport(report);
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-              ),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
               child: Text(
                 'Delete',
-                style: AppTextStyles.body.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: AppTextStyles.body.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
               ),
             ),
           ],
@@ -350,20 +281,10 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   }
 
   void _showSuccessMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.success,
-      ),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), backgroundColor: AppColors.success));
   }
 
   void _showErrorMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.error,
-      ),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), backgroundColor: AppColors.error));
   }
 }

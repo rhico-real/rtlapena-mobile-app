@@ -34,24 +34,7 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
         RichText(
           text: TextSpan(
             style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
-            children: [
-              const TextSpan(text: 'Work Progress Log - Tap '),
-              WidgetSpan(
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Icon(
-                    Icons.camera_alt,
-                    size: 16,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              const TextSpan(text: ' for photos'),
-            ],
+            children: [const TextSpan(text: 'Work Progress Log')],
           ),
         ),
         const SizedBox(height: 12),
@@ -67,10 +50,7 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
               _buildOverallSummary(),
               const SizedBox(height: 16),
               _buildQuickTimeSlotSelector(),
-              if (_selectedSlotIndex != null) ...[
-                const SizedBox(height: 16),
-                _buildSelectedSlotEditor(),
-              ],
+              if (_selectedSlotIndex != null) ...[const SizedBox(height: 16), _buildSelectedSlotEditor()],
             ],
           ),
         ),
@@ -98,11 +78,7 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
             value: '$entriesWithWork / ${TimeSlots.slots.length}',
             color: AppColors.primary,
           ),
-          Container(
-            width: 1,
-            height: 40,
-            color: AppColors.border,
-          ),
+          Container(width: 1, height: 40, color: AppColors.border),
           _buildSummaryItem(
             icon: Icons.photo_camera,
             label: 'Total\nPhotos',
@@ -126,16 +102,11 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
         const SizedBox(height: 4),
         Text(
           value,
-          style: AppTextStyles.heading3.copyWith(
-            color: color,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTextStyles.heading3.copyWith(color: color, fontWeight: FontWeight.bold),
         ),
         Text(
           label,
-          style: AppTextStyles.caption.copyWith(
-            color: AppColors.textSecondary,
-          ),
+          style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
           textAlign: TextAlign.center,
         ),
       ],
@@ -148,10 +119,7 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
       children: [
         Text(
           'Select Time Slot to Edit',
-          style: AppTextStyles.body.copyWith(
-            fontWeight: FontWeight.w600,
-            color: AppColors.textSecondary,
-          ),
+          style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600, color: AppColors.textSecondary),
         ),
         const SizedBox(height: 12),
         _buildShiftButtons('Morning Shift', TimeSlots.morningSlots),
@@ -167,10 +135,7 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
       children: [
         Text(
           shiftName,
-          style: AppTextStyles.caption.copyWith(
-            fontWeight: FontWeight.w600,
-            color: AppColors.textSecondary,
-          ),
+          style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600, color: AppColors.textSecondary),
         ),
         const SizedBox(height: 8),
         Wrap(
@@ -194,15 +159,15 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
                   color: isSelected
                       ? AppColors.primary
                       : hasContent
-                          ? AppColors.primary.withOpacity(0.1)
-                          : Colors.white,
+                      ? AppColors.primary.withOpacity(0.1)
+                      : Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: isSelected
                         ? AppColors.primary
                         : hasContent
-                            ? AppColors.primary.withOpacity(0.3)
-                            : AppColors.border,
+                        ? AppColors.primary.withOpacity(0.3)
+                        : AppColors.border,
                   ),
                 ),
                 child: Row(
@@ -214,8 +179,8 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
                         color: isSelected
                             ? Colors.white
                             : hasContent
-                                ? AppColors.primary
-                                : AppColors.textSecondary,
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -262,25 +227,17 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
               const SizedBox(width: 8),
               Text(
                 slot.label,
-                style: AppTextStyles.body.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
+                style: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold, color: AppColors.primary),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          Text(
-            'Work Activity',
-            style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
-          ),
+          Text('Work Activity', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           TextField(
             onChanged: (value) => widget.onTextChange(_selectedSlotIndex!, value),
             controller: TextEditingController(text: entry.log)
-              ..selection = TextSelection.fromPosition(
-                TextPosition(offset: entry.log.length),
-              ),
+              ..selection = TextSelection.fromPosition(TextPosition(offset: entry.log.length)),
             maxLines: 3,
             decoration: InputDecoration(
               hintText: 'Describe work activity for this time slot...',
@@ -298,19 +255,13 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
           const SizedBox(height: 16),
           Row(
             children: [
-              Text(
-                'Photos (${entry.photos.length})',
-                style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
-              ),
+              Text('Photos (${entry.photos.length})', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
               const Spacer(),
               GestureDetector(
                 onTap: () => _addPhoto(_selectedSlotIndex!),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                  decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(16)),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -318,10 +269,7 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
                       const SizedBox(width: 4),
                       Text(
                         'Add Photo',
-                        style: AppTextStyles.caption.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: AppTextStyles.caption.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
@@ -366,10 +314,7 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
                     color: AppColors.background,
-                    child: const Icon(
-                      Icons.broken_image,
-                      color: AppColors.textSecondary,
-                    ),
+                    child: const Icon(Icons.broken_image, color: AppColors.textSecondary),
                   );
                 },
               ),
@@ -384,15 +329,8 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
             child: Container(
               width: 20,
               height: 20,
-              decoration: const BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.close,
-                size: 14,
-                color: Colors.white,
-              ),
+              decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+              child: const Icon(Icons.close, size: 14, color: Colors.white),
             ),
           ),
         ),
@@ -416,18 +354,15 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
           name: image.name,
         );
         widget.onPhotoAdd(index, photo);
-        
+
         // Refresh the display
         setState(() {});
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error taking photo: $e'),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error taking photo: $e'), backgroundColor: AppColors.error));
       }
     }
   }
@@ -440,22 +375,13 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
           backgroundColor: Colors.black,
           child: Stack(
             children: [
-              Center(
-                child: Image.file(
-                  File(imagePath),
-                  fit: BoxFit.contain,
-                ),
-              ),
+              Center(child: Image.file(File(imagePath), fit: BoxFit.contain)),
               Positioned(
                 top: 16,
                 right: 16,
                 child: IconButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(
-                    Icons.close,
-                    color: Colors.white,
-                    size: 32,
-                  ),
+                  icon: const Icon(Icons.close, color: Colors.white, size: 32),
                 ),
               ),
             ],

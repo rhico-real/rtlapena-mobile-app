@@ -1,15 +1,14 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:gal/gal.dart';
 import '../models/daily_report.dart';
 import '../constants/app_constants.dart';
 
 class PdfService {
-  static Future<void> generateAndSharePdf(DailyReport report) async {
+  static Future<String> generateAndSavePdf(DailyReport report) async {
     final pdf = pw.Document();
     
     // Load font
@@ -42,16 +41,70 @@ class PdfService {
       ),
     );
 
-    // Save and share PDF
-    final output = await getTemporaryDirectory();
+    // Generate PDF bytes and save locally for viewing
+    final pdfBytes = await pdf.save();
     final fileName = 'Report_${report.blockNumber}_${report.lotNumber}_${report.reportDate}.pdf';
-    final file = File('${output.path}/$fileName');
-    await file.writeAsBytes(await pdf.save());
-
-    await Share.shareXFiles(
-      [XFile(file.path)],
-      text: 'Daily Construction Report - ${report.reportDate}',
-    );
+    
+    // Save to app documents directory for viewing
+    final directory = await getApplicationDocumentsDirectory();
+    final localFile = File('${directory.path}/$fileName');
+    await localFile.writeAsBytes(pdfBytes);
+    
+    return localFile.path;
+  }
+  
+  static Future<String> downloadPdf(String filePath) async {
+    try {
+      final file = File(filePath);
+      if (await file.exists()) {
+        final bytes = await file.readAsBytes();
+        final fileName = filePath.split('/').last;
+        
+        if (Platform.isAndroid) {
+          // Save to external storage Downloads folder using proper path
+          try {
+            // Get external storage directory
+            final Directory? externalDir = await getExternalStorageDirectory();
+            if (externalDir != null) {
+              // Navigate to the public Downloads folder
+              final String externalPath = externalDir.path;
+              final String downloadsPath = externalPath.replaceAll('/Android/data/com.example.rtlapena/files', '/Download');
+              
+              final downloadsDir = Directory(downloadsPath);
+              if (!downloadsDir.existsSync()) {
+                downloadsDir.createSync(recursive: true);
+              }
+              
+              final downloadFile = File('${downloadsDir.path}/$fileName');
+              await downloadFile.writeAsBytes(bytes);
+              
+              return downloadFile.path;
+            } else {
+              throw Exception('Could not access external storage');
+            }
+          } catch (e) {
+            // Fallback: use Gal package to save file to gallery
+            final tempDir = await getTemporaryDirectory();
+            final tempFile = File('${tempDir.path}/$fileName');
+            await tempFile.writeAsBytes(bytes);
+            
+            await Gal.putImage(tempFile.path, album: 'Downloads');
+            return 'PDF saved to Downloads folder';
+          }
+        } else {
+          // For other platforms, use the printing package
+          await Printing.sharePdf(
+            bytes: bytes,
+            filename: fileName,
+          );
+          return 'PDF shared successfully';
+        }
+      } else {
+        throw Exception('PDF file not found');
+      }
+    } catch (e) {
+      throw Exception('Could not download PDF: $e');
+    }
   }
 
   static pw.Widget _buildHeader(DailyReport report, pw.Font fontBold) {

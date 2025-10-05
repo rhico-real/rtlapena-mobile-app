@@ -22,26 +22,10 @@ class WeatherConditions {
   static const String heavyRain = 'heavy_rain';
 
   static const Map<String, WeatherInfo> weatherMap = {
-    fair: WeatherInfo(
-      name: 'Fair',
-      color: Colors.green,
-      textColor: Colors.white,
-    ),
-    cloudy: WeatherInfo(
-      name: 'Cloudy',
-      color: Colors.grey,
-      textColor: Colors.black87,
-    ),
-    rain: WeatherInfo(
-      name: 'Rain Shower',
-      color: Colors.blue,
-      textColor: Colors.white,
-    ),
-    heavyRain: WeatherInfo(
-      name: 'Heavy Rain',
-      color: Colors.red,
-      textColor: Colors.white,
-    ),
+    fair: WeatherInfo(name: 'Fair', color: Colors.green, textColor: Colors.white),
+    cloudy: WeatherInfo(name: 'Cloudy', color: Colors.grey, textColor: Colors.black87),
+    rain: WeatherInfo(name: 'Rain Shower', color: Colors.blue, textColor: Colors.white),
+    heavyRain: WeatherInfo(name: 'Heavy Rain', color: Colors.red, textColor: Colors.white),
   };
 
   static List<String> get allConditions => weatherMap.keys.toList();
@@ -52,11 +36,7 @@ class WeatherInfo {
   final Color color;
   final Color textColor;
 
-  const WeatherInfo({
-    required this.name,
-    required this.color,
-    required this.textColor,
-  });
+  const WeatherInfo({required this.name, required this.color, required this.textColor});
 }
 
 // Time slots
@@ -73,21 +53,16 @@ class TimeSlots {
     TimeSlotInfo(label: '4:00 - 4:30 PM', group: 'outer'),
   ];
 
-  static List<TimeSlotInfo> get morningSlots =>
-      slots.where((slot) => slot.group == 'inner').toList();
+  static List<TimeSlotInfo> get morningSlots => slots.where((slot) => slot.group == 'inner').toList();
 
-  static List<TimeSlotInfo> get afternoonSlots =>
-      slots.where((slot) => slot.group == 'outer').toList();
+  static List<TimeSlotInfo> get afternoonSlots => slots.where((slot) => slot.group == 'outer').toList();
 }
 
 class TimeSlotInfo {
   final String label;
   final String group;
 
-  const TimeSlotInfo({
-    required this.label,
-    required this.group,
-  });
+  const TimeSlotInfo({required this.label, required this.group});
 }
 
 // Unit types
@@ -96,40 +71,20 @@ class UnitTypes {
   static const String loft = 'loft';
   static const String duplex = 'duplex';
 
-  static const Map<String, String> unitTypeNames = {
-    bungalow: 'Bungalow',
-    loft: 'Loft',
-    duplex: 'Duplex',
-  };
+  static const Map<String, String> unitTypeNames = {bungalow: 'Bungalow', loft: 'Loft', duplex: 'Duplex'};
 
   static List<String> get allTypes => unitTypeNames.keys.toList();
 }
 
 // Text styles
 class AppTextStyles {
-  static const TextStyle heading1 = TextStyle(
-    fontSize: 24,
-    fontWeight: FontWeight.bold,
-    color: AppColors.text,
-  );
+  static const TextStyle heading1 = TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.text);
 
-  static const TextStyle heading2 = TextStyle(
-    fontSize: 20,
-    fontWeight: FontWeight.w600,
-    color: AppColors.text,
-  );
+  static const TextStyle heading2 = TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: AppColors.text);
 
-  static const TextStyle heading3 = TextStyle(
-    fontSize: 18,
-    fontWeight: FontWeight.w600,
-    color: AppColors.text,
-  );
+  static const TextStyle heading3 = TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.text);
 
-  static const TextStyle body = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.normal,
-    color: AppColors.text,
-  );
+  static const TextStyle body = TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: AppColors.text);
 
   static const TextStyle caption = TextStyle(
     fontSize: 12,
@@ -137,9 +92,5 @@ class AppTextStyles {
     color: AppColors.textSecondary,
   );
 
-  static const TextStyle button = TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.w600,
-    color: Colors.white,
-  );
+  static const TextStyle button = TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white);
 }

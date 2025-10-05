@@ -1,4 +1,4 @@
-package com.example.rtlapena-mobile-app
+package com.example.rtlapena_mobile_app
 
 import io.flutter.embedding.android.FlutterActivity
 

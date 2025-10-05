@@ -21,7 +21,7 @@ class ReportFormScreen extends StatefulWidget {
 class _ReportFormScreenState extends State<ReportFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _databaseService = DatabaseService();
-  
+
   // Form controllers
   late TextEditingController _contractorNameController;
   late TextEditingController _blockNumberController;
@@ -29,14 +29,14 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   late TextEditingController _personnelCountController;
   late TextEditingController _issuesController;
   late TextEditingController _safetyNotesController;
-  
+
   // Form state
   late DateTime _selectedDate;
   late String _selectedUnitType;
   late List<String> _weatherStates;
   late List<WorkEntry> _workEntries;
   late List<IssuePhoto> _issuePhotos;
-  
+
   bool _isLoading = false;
   String? _currentReportId;
 
@@ -71,12 +71,9 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
       _issuesController = TextEditingController();
       _safetyNotesController = TextEditingController();
       _weatherStates = List.filled(TimeSlots.slots.length, WeatherConditions.fair);
-      _workEntries = TimeSlots.slots.map((slot) => WorkEntry(
-        time: slot.label,
-        group: slot.group,
-        log: '',
-        photos: [],
-      )).toList();
+      _workEntries = TimeSlots.slots
+          .map((slot) => WorkEntry(time: slot.label, group: slot.group, log: '', photos: []))
+          .toList();
       _issuePhotos = [];
     }
   }
@@ -105,16 +102,13 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
         elevation: 0,
         actions: [
           IconButton(
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const ReportsListScreen()),
-            ),
-            icon: const Icon(Icons.list, color: Colors.white),
+            onPressed: () =>
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ReportsListScreen())),
+            icon: const Icon(Icons.menu, color: Colors.white),
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
-          : _buildForm(),
+      body: _isLoading ? const Center(child: CircularProgressIndicator(color: AppColors.primary)) : _buildForm(),
       bottomNavigationBar: _buildBottomActions(),
     );
   }
@@ -145,33 +139,19 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 2))],
       ),
       child: Column(
         children: [
           Text(
             'R.T. LAPEÑA CONSTRUCTION & SUPPLY, INC.',
-            style: AppTextStyles.heading2.copyWith(
-              color: AppColors.primary,
-              fontSize: 18,
-            ),
+            style: AppTextStyles.heading2.copyWith(color: AppColors.primary, fontSize: 18),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
           Text(
-            _currentReportId != null 
-                ? 'Edit Daily Report'
-                : 'New Daily Report',
-            style: AppTextStyles.heading1.copyWith(
-              color: AppColors.primary,
-              fontSize: 22,
-            ),
+            _currentReportId != null ? 'Edit Daily Report' : 'New Daily Report',
+            style: AppTextStyles.heading1.copyWith(color: AppColors.primary, fontSize: 22),
             textAlign: TextAlign.center,
           ),
         ],
@@ -323,23 +303,12 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 2))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: AppTextStyles.heading2.copyWith(
-              color: AppColors.textSecondary,
-            ),
-          ),
+          Text(title, style: AppTextStyles.heading2.copyWith(color: AppColors.textSecondary)),
           const Divider(height: 24),
           ...children,
         ],
@@ -351,10 +320,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Date of Report',
-          style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
-        ),
+        Text('Date of Report', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
         const SizedBox(height: 8),
         GestureDetector(
           onTap: _selectDate,
@@ -367,10 +333,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  DateFormat('yyyy-MM-dd').format(_selectedDate),
-                  style: AppTextStyles.body,
-                ),
+                Text(DateFormat('yyyy-MM-dd').format(_selectedDate), style: AppTextStyles.body),
                 const Icon(Icons.calendar_today, color: AppColors.primary),
               ],
             ),
@@ -384,10 +347,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Unit Type',
-          style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
-        ),
+        Text('Unit Type', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
           value: _selectedUnitType,
@@ -403,10 +363,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
             contentPadding: const EdgeInsets.all(16),
           ),
           items: UnitTypes.allTypes.map((type) {
-            return DropdownMenuItem(
-              value: type,
-              child: Text(UnitTypes.unitTypeNames[type]!),
-            );
+            return DropdownMenuItem(value: type, child: Text(UnitTypes.unitTypeNames[type]!));
           }).toList(),
           onChanged: (value) {
             setState(() {
@@ -430,10 +387,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
-        ),
+        Text(label, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
@@ -462,13 +416,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -2))],
       ),
       child: Row(
         children: [
@@ -479,14 +427,9 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              child: Text(
-                _currentReportId != null ? 'Update Report' : 'Save Report',
-                style: AppTextStyles.button,
-              ),
+              child: Text(_currentReportId != null ? 'Update Report' : 'Save Report', style: AppTextStyles.button),
             ),
           ),
           const SizedBox(width: 12),
@@ -497,14 +440,9 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                 backgroundColor: Colors.grey[700],
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              child: Text(
-                'Save & Start New',
-                style: AppTextStyles.button,
-              ),
+              child: Text('Save & Start New', style: AppTextStyles.button, textAlign: TextAlign.center),
             ),
           ),
           const SizedBox(width: 12),
@@ -515,14 +453,9 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                 backgroundColor: Colors.red[600],
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              child: Text(
-                'Export PDF',
-                style: AppTextStyles.button,
-              ),
+              child: Text('Export PDF', style: AppTextStyles.button),
             ),
           ),
         ],
@@ -554,7 +487,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     try {
       final report = _createReport();
       final id = await _databaseService.saveReport(report);
-      
+
       setState(() {
         _currentReportId = id;
       });
@@ -573,7 +506,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     await _saveReport();
-    
+
     if (_currentReportId != null) {
       _resetForm();
     }
@@ -606,11 +539,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     final weatherLog = TimeSlots.slots.asMap().entries.map((entry) {
       final index = entry.key;
       final slot = entry.value;
-      return WeatherEntry(
-        time: slot.label,
-        group: slot.group,
-        condition: _weatherStates[index],
-      );
+      return WeatherEntry(time: slot.label, group: slot.group, condition: _weatherStates[index]);
     }).toList();
 
     return DailyReport(
@@ -642,42 +571,24 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
       _issuesController.clear();
       _safetyNotesController.clear();
       _weatherStates = List.filled(TimeSlots.slots.length, WeatherConditions.fair);
-      _workEntries = TimeSlots.slots.map((slot) => WorkEntry(
-        time: slot.label,
-        group: slot.group,
-        log: '',
-        photos: [],
-      )).toList();
+      _workEntries = TimeSlots.slots
+          .map((slot) => WorkEntry(time: slot.label, group: slot.group, log: '', photos: []))
+          .toList();
       _issuePhotos = [];
     });
   }
 
   void _showSuccessMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.success,
-      ),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), backgroundColor: AppColors.success));
   }
 
   void _showErrorMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.error,
-      ),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), backgroundColor: AppColors.error));
   }
 }
 
 extension WorkEntryExtension on WorkEntry {
-  WorkEntry copyWith({
-    String? time,
-    String? group,
-    String? log,
-    List<WorkPhoto>? photos,
-  }) {
+  WorkEntry copyWith({String? time, String? group, String? log, List<WorkPhoto>? photos}) {
     return WorkEntry(
       time: time ?? this.time,
       group: group ?? this.group,

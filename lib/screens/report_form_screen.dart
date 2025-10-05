@@ -101,11 +101,16 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
         backgroundColor: AppColors.primary,
         elevation: 0,
         actions: [
-          IconButton(
+          TextButton.icon(
             onPressed: () =>
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ReportsListScreen())),
-            icon: const Icon(Icons.menu, color: Colors.white),
+            icon: const Icon(Icons.folder_open, color: Colors.white, size: 20),
+            label: const Text(
+              'Saved Reports',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14),
+            ),
           ),
+          const SizedBox(width: 8),
         ],
       ),
       body: _isLoading ? const Center(child: CircularProgressIndicator(color: AppColors.primary)) : _buildForm(),

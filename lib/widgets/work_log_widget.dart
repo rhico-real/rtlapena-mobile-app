@@ -24,6 +24,7 @@ class WorkLogWidget extends StatefulWidget {
 
 class _WorkLogWidgetState extends State<WorkLogWidget> {
   final ImagePicker _picker = ImagePicker();
+  int? _selectedSlotIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +35,7 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
           text: TextSpan(
             style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
             children: [
-              const TextSpan(text: 'Detailed Hourly Work Log (Tap '),
+              const TextSpan(text: 'Work Progress Log - Tap '),
               WidgetSpan(
                 child: Container(
                   padding: const EdgeInsets.all(2),
@@ -49,7 +50,7 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
                   ),
                 ),
               ),
-              const TextSpan(text: ' to take or select a photo for this segment.)'),
+              const TextSpan(text: ' for photos'),
             ],
           ),
         ),
@@ -63,9 +64,13 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
           ),
           child: Column(
             children: [
-              _buildShiftSection('Morning Shift (7:30 AM - 12:00 NN)', TimeSlots.morningSlots),
+              _buildOverallSummary(),
               const SizedBox(height: 16),
-              _buildShiftSection('Afternoon Shift (1:00 PM - 4:30 PM)', TimeSlots.afternoonSlots),
+              _buildQuickTimeSlotSelector(),
+              if (_selectedSlotIndex != null) ...[
+                const SizedBox(height: 16),
+                _buildSelectedSlotEditor(),
+              ],
             ],
           ),
         ),
@@ -73,61 +78,212 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
     );
   }
 
-  Widget _buildShiftSection(String title, List<TimeSlotInfo> slots) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: AppTextStyles.body.copyWith(
-            fontWeight: FontWeight.bold,
-            color: AppColors.textSecondary,
-          ),
-        ),
-        const Divider(height: 16),
-        ...slots.asMap().entries.map((entry) {
-          final globalIndex = TimeSlots.slots.indexOf(entry.value);
-          return _buildWorkSlot(entry.value, globalIndex);
-        }).toList(),
-      ],
-    );
-  }
-
-  Widget _buildWorkSlot(TimeSlotInfo slot, int index) {
-    final workEntry = widget.workEntries[index];
+  Widget _buildOverallSummary() {
+    final totalPhotos = widget.workEntries.fold<int>(0, (sum, entry) => sum + entry.photos.length);
+    final entriesWithWork = widget.workEntries.where((entry) => entry.log.trim().isNotEmpty).length;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: AppColors.border),
       ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildSummaryItem(
+            icon: Icons.work,
+            label: 'Time Slots\nWith Work',
+            value: '$entriesWithWork / ${TimeSlots.slots.length}',
+            color: AppColors.primary,
+          ),
+          Container(
+            width: 1,
+            height: 40,
+            color: AppColors.border,
+          ),
+          _buildSummaryItem(
+            icon: Icons.photo_camera,
+            label: 'Total\nPhotos',
+            value: totalPhotos.toString(),
+            color: AppColors.success,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryItem({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Column(
+      children: [
+        Icon(icon, color: color, size: 24),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: AppTextStyles.heading3.copyWith(
+            color: color,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          label,
+          style: AppTextStyles.caption.copyWith(
+            color: AppColors.textSecondary,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickTimeSlotSelector() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Select Time Slot to Edit',
+          style: AppTextStyles.body.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 12),
+        _buildShiftButtons('Morning Shift', TimeSlots.morningSlots),
+        const SizedBox(height: 12),
+        _buildShiftButtons('Afternoon Shift', TimeSlots.afternoonSlots),
+      ],
+    );
+  }
+
+  Widget _buildShiftButtons(String shiftName, List<TimeSlotInfo> slots) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          shiftName,
+          style: AppTextStyles.caption.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: slots.map((slot) {
+            final globalIndex = TimeSlots.slots.indexOf(slot);
+            final entry = widget.workEntries[globalIndex];
+            final hasContent = entry.log.trim().isNotEmpty || entry.photos.isNotEmpty;
+            final isSelected = _selectedSlotIndex == globalIndex;
+
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedSlotIndex = isSelected ? null : globalIndex;
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? AppColors.primary
+                      : hasContent
+                          ? AppColors.primary.withOpacity(0.1)
+                          : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isSelected
+                        ? AppColors.primary
+                        : hasContent
+                            ? AppColors.primary.withOpacity(0.3)
+                            : AppColors.border,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      slot.label,
+                      style: AppTextStyles.caption.copyWith(
+                        color: isSelected
+                            ? Colors.white
+                            : hasContent
+                                ? AppColors.primary
+                                : AppColors.textSecondary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (hasContent) ...[
+                      const SizedBox(width: 4),
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: isSelected ? Colors.white : AppColors.primary,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSelectedSlotEditor() {
+    if (_selectedSlotIndex == null) return const SizedBox.shrink();
+
+    final slot = TimeSlots.slots[_selectedSlotIndex!];
+    final entry = widget.workEntries[_selectedSlotIndex!];
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            children: [
+              Icon(Icons.schedule, color: AppColors.primary, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                slot.label,
+                style: AppTextStyles.body.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
           Text(
-            slot.label,
-            style: AppTextStyles.caption.copyWith(
-              fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
-            ),
+            'Work Activity',
+            style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
-          Text(
-            'Current Activity',
-            style: AppTextStyles.body.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 4),
           TextField(
-            onChanged: (value) => widget.onTextChange(index, value),
-            controller: TextEditingController(text: workEntry.log)..selection = TextSelection.fromPosition(TextPosition(offset: workEntry.log.length)),
-            maxLines: 2,
+            onChanged: (value) => widget.onTextChange(_selectedSlotIndex!, value),
+            controller: TextEditingController(text: entry.log)
+              ..selection = TextSelection.fromPosition(
+                TextPosition(offset: entry.log.length),
+              ),
+            maxLines: 3,
             decoration: InputDecoration(
-              hintText: 'Describe current activity...',
+              hintText: 'Describe work activity for this time slot...',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: const BorderSide(color: AppColors.border),
@@ -139,21 +295,54 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
               contentPadding: const EdgeInsets.all(12),
             ),
           ),
-          const SizedBox(height: 12),
-          _buildPhotoSection(index, workEntry.photos),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Text(
+                'Photos (${entry.photos.length})',
+                style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: () => _addPhoto(_selectedSlotIndex!),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.camera_alt, color: Colors.white, size: 16),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Add Photo',
+                        style: AppTextStyles.caption.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (entry.photos.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            _buildPhotoGrid(entry.photos, _selectedSlotIndex!),
+          ],
         ],
       ),
     );
   }
 
-  Widget _buildPhotoSection(int index, List<WorkPhoto> photos) {
+  Widget _buildPhotoGrid(List<WorkPhoto> photos, int index) {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
-      children: [
-        ...photos.map((photo) => _buildPhotoThumbnail(index, photo)),
-        _buildAddPhotoButton(index),
-      ],
+      children: photos.map((photo) => _buildPhotoThumbnail(index, photo)).toList(),
     );
   }
 
@@ -163,8 +352,8 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
         GestureDetector(
           onTap: () => _showImagePreview(photo.url),
           child: Container(
-            width: 80,
-            height: 80,
+            width: 60,
+            height: 60,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: AppColors.primary, width: 2),
@@ -193,40 +382,21 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
           child: GestureDetector(
             onTap: () => widget.onPhotoRemove(index, photo.id),
             child: Container(
-              width: 24,
-              height: 24,
+              width: 20,
+              height: 20,
               decoration: const BoxDecoration(
                 color: Colors.red,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.close,
-                size: 16,
+                size: 14,
                 color: Colors.white,
               ),
             ),
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildAddPhotoButton(int index) {
-    return GestureDetector(
-      onTap: () => _addPhoto(index),
-      child: Container(
-        width: 80,
-        height: 80,
-        decoration: BoxDecoration(
-          color: AppColors.primary,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: const Icon(
-          Icons.camera_alt,
-          color: Colors.white,
-          size: 32,
-        ),
-      ),
     );
   }
 
@@ -246,6 +416,9 @@ class _WorkLogWidgetState extends State<WorkLogWidget> {
           name: image.name,
         );
         widget.onPhotoAdd(index, photo);
+        
+        // Refresh the display
+        setState(() {});
       }
     } catch (e) {
       if (mounted) {
